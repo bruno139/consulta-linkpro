@@ -41,7 +41,7 @@ http
 
 // ---------- publicação automática
 function sincronizar() {
-  if (!fs.existsSync(path.join(__dirname, ".git"))) return;
+  if (!fs.existsSync(path.join(__dirname, ".git")) || process.env.SEM_PUBLICAR) return;
   let timer;
   const rodar = (motivo) => {
     try {

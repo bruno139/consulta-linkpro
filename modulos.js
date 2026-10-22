@@ -3,6 +3,18 @@
 // Para mudar um vídeo de módulo, ajuste a expressão (o título é comparado sem acentos e em minúsculas).
 module.exports = [
   {
+    id: "versoes",
+    nome: "Versões e Novidades",
+    descricao: "Histórico de versões do Link, novidades dos sistemas e lançamentos.",
+    regra: /historico da versao|novidades|lancamento/,
+  },
+  {
+    id: "apps",
+    nome: "Apps e Sistemas Auxiliares",
+    descricao: "Navi Vendas, Link Móvel, Link Web, Link Garçom, Autoatendimento, Balanço Estoque e demonstrações gerais.",
+    regra: /^navi vendas|link movel|link web|link garcom|autoatendimento|balanco estoque|demonstracao do sistema/,
+  },
+  {
     id: "produtos",
     nome: "Cadastro de Produtos",
     descricao: "Abas do cadastro, combos, multissabor, variações, grupos, marcas e unidades.",

@@ -3,11 +3,25 @@ const fs = require("fs");
 const path = require("path");
 
 const PASTA = process.env.LINK_PRO_DIR || path.resolve(__dirname, "..", "..", "Link_PRO", "saida_link_pro");
-const PLAYLISTS = {
+// Nome bonito de cada pasta de playlist. Pastas novas entram sozinhas, com o nome tirado da própria pasta.
+const ROTULOS = {
   tutoriais: "Tutorial",
   treinamentos: "Treinamento",
   "cadastro-de-produtos": "Cadastro de Produtos",
+  demonstracoes: "Demonstração",
+  novidades: "Novidades",
+  "historico-de-versoes": "Histórico de versões",
+  "sistemas-auxiliares": "Sistemas auxiliares",
 };
+const rotulo = (pasta) => ROTULOS[pasta] || (pasta.charAt(0).toUpperCase() + pasta.slice(1)).replace(/[-_]+/g, " ");
+
+function playlists() {
+  const ordem = Object.keys(ROTULOS);
+  return fs.readdirSync(PASTA, { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .sort((a, b) => (ordem.indexOf(a) + 1 || 99) - (ordem.indexOf(b) + 1 || 99) || a.localeCompare(b));
+}
 
 const semAcento = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
@@ -16,6 +30,9 @@ function tituloCurto(titulo) {
     .replace(/^Link( PRO)?\s*-\s*/i, "")
     .replace(/^(Tutorial|Treinamento( de Cadastro de Produtos)?)\s*-\s*/i, "")
     .replace(/^Treinamento\s+/i, "")
+    .replace(/\s#\S+/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/[\s-]+$/, "")
     .replace(/\?$/, "")
     .trim();
 }
@@ -38,9 +55,11 @@ function carregar() {
   delete require.cache[require.resolve("./modulos")];
   const MODULOS = require("./modulos");
   const videos = new Map();
-  for (const [pastaPl, nomePl] of Object.entries(PLAYLISTS)) {
+  const tipos = [];
+  for (const pastaPl of playlists()) {
     const dir = path.join(PASTA, pastaPl);
-    if (!fs.existsSync(dir)) continue;
+    const nomePl = rotulo(pastaPl);
+    tipos.push(nomePl);
     for (const sub of fs.readdirSync(dir).sort()) {
       const arq = path.join(dir, sub, "transcricao.md");
       if (!fs.existsSync(arq)) continue;
@@ -66,6 +85,7 @@ function carregar() {
     }
   }
   return {
+    tipos,
     modulos: MODULOS.map(({ id, nome, descricao }) => ({ id, nome, descricao })),
     videos: [...videos.values()],
   };

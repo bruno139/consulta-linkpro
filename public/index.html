@@ -62,23 +62,23 @@
   .busca .limpar { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: 0; background: none; color: var(--muted); font-size: 22px; line-height: 1; padding: 4px 8px; display: none; }
 
   /* cards de resumo */
-  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 18px; }
-  .card { background: var(--surface); border: 2px solid transparent; border-radius: var(--raio); padding: 20px 24px; text-align: left; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+  .card { background: var(--surface); border: 2px solid transparent; border-radius: var(--raio); padding: 16px 20px; text-align: left; }
   button.card:hover { border-color: var(--laranja-suave); }
   .card.ativo { border-color: var(--laranja); }
   .card .rot { font-weight: 500; font-size: 15.5px; }
-  .card .valor { font-weight: 600; font-size: 19px; margin-top: 12px; }
+  .card .valor { font-weight: 600; font-size: 18px; margin-top: 8px; }
   .card .sub { color: var(--muted); font-size: 13px; }
 
   /* atalhos de módulo */
   .atalhos { display: flex; flex-wrap: wrap; gap: 6px 4px; margin: 22px 0 8px; }
-  .atalho { border: 0; background: none; width: 100px; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 0 0 6px; position: relative; }
-  .atalho .q { width: 80px; height: 80px; border-radius: var(--raio); background: var(--surface); display: grid; place-items: center; color: var(--laranja); transition: transform .12s; }
+  .atalho { border: 0; background: none; width: 80px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0 0 6px; position: relative; }
+  .atalho .q { width: 68px; height: 68px; border-radius: var(--raio); background: var(--surface); display: grid; place-items: center; color: var(--laranja); transition: transform .12s; }
   .atalho:hover .q { transform: translateY(-2px); }
   .atalho.ativo .q { background: var(--laranja); color: #fff; }
-  .atalho .nome { font-size: 14.5px; }
+  .atalho .nome { font-size: 13.5px; }
   .atalho.ativo .nome { color: var(--laranja); font-weight: 500; }
-  .atalho .n { position: absolute; top: -6px; right: 8px; background: var(--topo); color: #fff; font-size: 11px; font-weight: 600; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; display: grid; place-items: center; }
+  .atalho .n { position: absolute; top: -6px; right: 0; background: var(--topo); color: #fff; font-size: 11px; font-weight: 600; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; display: grid; place-items: center; }
   .atalho.vazio { opacity: .35; }
 
   /* listas */
@@ -127,14 +127,15 @@
     .faixa { flex-wrap: wrap; }
     .faixa .txt { white-space: normal; }
     .busca { flex-basis: 100%; }
-    .cards { grid-template-columns: 1fr; }
+    .cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .card { padding: 12px 14px; }
     .lista { grid-template-columns: 1fr; }
     .dlg-corpo { grid-template-columns: 1fr; overflow: auto; }
     .transcricao { max-height: none; overflow: visible; }
     .wrap { padding: 0 16px; }
-    .atalho { width: 25%; min-width: 76px; }
-    .atalho .q { width: 64px; height: 64px; }
-    .atalho .nome { font-size: 13px; }
+    .atalho { width: 25%; min-width: 72px; }
+    .atalho .q { width: 60px; height: 60px; }
+    .atalho .nome { font-size: 12.5px; }
   }
 </style>
 </head>
@@ -203,13 +204,20 @@ const ATALHOS = [
   ["fiscal", "Fiscal", svg('<path d="M6 2h9l4 4v16l-3-2-2 2-2-2-2 2-2-2-2 2z"/><path d="M9 9h6M9 13h6M14 2v4h5"/>')],
   ["financeiro", "Financeiro", svg('<rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20M6 15h4"/>')],
   ["equipamentos", "Etiquetas", svg('<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.5"/>')],
+  ["apps", "Apps", svg('<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/>')],
+  ["versoes", "Versões", svg('<path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>')],
   ["sistema", "Config", svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>')],
 ];
-const TIPOS = [
-  ["Tutorial", "Tutoriais", "vídeos curtos de passo a passo"],
-  ["Treinamento", "Treinamentos", "aulas completas por assunto"],
-  ["Cadastro de Produtos", "Cadastro de Produtos", "série sobre o cadastro"],
-];
+// Nome e explicação de cada playlist nos cards. Playlist nova sem entrada aqui aparece com o próprio nome.
+const TIPOS = {
+  "Tutorial": ["Tutoriais", "passo a passo curtos"],
+  "Treinamento": ["Treinamentos", "aulas completas por assunto"],
+  "Cadastro de Produtos": ["Cadastro de Produtos", "série sobre o cadastro"],
+  "Demonstração": ["Demonstrações", "apresentação dos sistemas"],
+  "Novidades": ["Novidades", "lançamentos e o que mudou"],
+  "Histórico de versões": ["Histórico de versões", "o que entrou em cada versão"],
+  "Sistemas auxiliares": ["Sistemas auxiliares", "apps que trabalham com o Link"],
+};
 const PLAY = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.2-6.5a1 1 0 0 0 0-1.8L9.5 4.6A1 1 0 0 0 8 5.5z"/></svg>';
 const PARADAS = new Set("a o e de da do das dos um uma no na nos nas em para por com como que se ao os as".split(" "));
 const estado = { modulo: "", tipo: "", q: "" };
@@ -287,7 +295,8 @@ const passa = (v, ignorar) =>
 
 // Cards de resumo = filtro por tipo; atalhos = filtro por módulo. Contagens respeitam a busca e o outro filtro.
 function desenharFiltros(base) {
-  $("#cards").innerHTML = TIPOS.map(([tipo, rot, sub]) => {
+  $("#cards").innerHTML = (dados.tipos || Object.keys(TIPOS)).map((tipo) => {
+    const [rot, sub] = TIPOS[tipo] || [tipo, ""];
     const n = base.filter((v) => v.tipos.includes(tipo) && passa(v, "tipo")).length;
     return `<button class="card ${estado.tipo === tipo ? "ativo" : ""}" data-tipo="${esc(tipo)}">
       <div class="rot">${rot}</div>
