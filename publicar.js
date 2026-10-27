@@ -10,7 +10,9 @@ const DOCS = path.join(__dirname, "docs");
 
 function gerar() {
   fs.mkdirSync(DOCS, { recursive: true });
-  fs.copyFileSync(path.join(__dirname, "public", "index.html"), path.join(DOCS, "index.html"));
+  for (const arq of fs.readdirSync(path.join(__dirname, "public"))) {
+    fs.copyFileSync(path.join(__dirname, "public", arq), path.join(DOCS, arq));
+  }
   fs.writeFileSync(path.join(DOCS, "conteudo.json"), JSON.stringify(carregar()));
   fs.writeFileSync(path.join(DOCS, ".nojekyll"), "");
 }
