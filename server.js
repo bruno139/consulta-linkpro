@@ -1,27 +1,31 @@
-// Consulta Link PRO: servidor local sem dependências.
-// Lê as transcrições da pasta Link_PRO a cada carregamento, então vídeos novos aparecem sozinhos.
-// Se esta pasta for um repositório git ligado ao GitHub, também publica sozinho quando a pasta Link_PRO muda.
+// Consulta Link PRO / PDV+: servidor local sem dependências.
+// Lê as transcrições das pastas Link_PRO e PDV_Plus a cada carregamento, então vídeos novos aparecem sozinhos.
+// Se esta pasta for um repositório git ligado ao GitHub, também publica sozinho quando essas pastas mudam.
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
-const { PASTA, carregar } = require("./dados");
+const { SISTEMAS, carregar } = require("./dados");
 const { publicar } = require("./publicar");
 
 const PORTA = Number(process.env.PORT) || 3001;
 const ESPERA_MS = 15000; // espera a pasta "assentar" antes de publicar (vários arquivos mudam juntos)
 
 const TIPOS = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8" };
+// Endereço do arquivo de dados -> sistema (conteudo.json = Link PRO, conteudo-pdv.json = PDV+).
+const DADOS = Object.fromEntries(Object.entries(SISTEMAS).map(([id, cfg]) => ["/" + cfg.arquivo, id]));
+DADOS["/api/conteudo"] = "linkpro";
 
 http
   .createServer((req, res) => {
     const url = new URL(req.url, "http://localhost");
-    if (url.pathname === "/conteudo.json" || url.pathname === "/api/conteudo") {
+    const sistema = DADOS[url.pathname];
+    if (sistema) {
       try {
         res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
-        res.end(JSON.stringify(carregar()));
+        res.end(JSON.stringify(carregar(sistema)));
       } catch (e) {
         res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
-        res.end("Erro ao ler a pasta " + PASTA + ": " + e.message);
+        res.end("Erro ao ler a pasta " + SISTEMAS[sistema].pasta + ": " + e.message);
       }
       return;
     }
@@ -34,8 +38,8 @@ http
     fs.createReadStream(arquivo).pipe(res);
   })
   .listen(PORTA, () => {
-    console.log(`Consulta Link PRO em http://localhost:${PORTA}`);
-    console.log(`Lendo transcrições de: ${PASTA}`);
+    console.log(`Consulta Link PRO / PDV+ em http://localhost:${PORTA}`);
+    for (const [id, cfg] of Object.entries(SISTEMAS)) console.log(`Lendo ${id}: ${cfg.pasta}`);
     sincronizar();
   });
 
@@ -50,13 +54,17 @@ function sincronizar() {
       console.error(`[${new Date().toLocaleTimeString("pt-BR")}] Falha ao publicar: ${e.message}`);
     }
   };
-  const agendar = () => {
+  const agendar = (motivo) => () => {
     clearTimeout(timer);
-    timer = setTimeout(() => rodar("Pasta Link_PRO mudou"), ESPERA_MS);
+    timer = setTimeout(() => rodar(motivo), ESPERA_MS);
   };
   rodar("Ao iniciar"); // pega mudanças feitas enquanto o app estava fechado
-  fs.watch(PASTA, { recursive: true }, agendar);
-  fs.watch(path.join(__dirname, "public"), agendar);
-  fs.watch(path.join(__dirname, "modulos.js"), agendar);
-  console.log("Publicação automática ligada: mudanças na pasta Link_PRO vão para o site em cerca de 1 minuto.");
+  for (const [id, cfg] of Object.entries(SISTEMAS)) {
+    if (fs.existsSync(cfg.pasta)) fs.watch(cfg.pasta, { recursive: true }, agendar(`Pasta do ${id} mudou`));
+    else console.log(`Aviso: a pasta do ${id} não existe (${cfg.pasta}).`);
+  }
+  fs.watch(path.join(__dirname, "public"), agendar("Tela mudou"));
+  fs.watch(path.join(__dirname, "modulos.js"), agendar("Regras de módulos mudaram"));
+  fs.watch(path.join(__dirname, "modulos-pdv.js"), agendar("Regras de módulos do PDV+ mudaram"));
+  console.log("Publicação automática ligada: mudanças nas pastas Link_PRO e PDV_Plus vão para o site em cerca de 1 minuto.");
 }

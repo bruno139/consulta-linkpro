@@ -44,17 +44,15 @@ const SISTEMAS = {
   pdv: {
     nome: "Consulta PDV+",
     dados: "conteudo-pdv.json",
-    pasta: "PDV+",
-    exemplo: "Ex.: abrir caixa, delivery, cadastro de cliente…",
+    pasta: "PDV_Plus",
+    exemplo: "Ex.: venda com Pix, iFood, monitor de cozinha, balanço de estoque…",
     atalhos: [
       ["", "Todos", ICONES.todos], ["caixa", "Caixa", ICONES.caixa], ["delivery", "Delivery", ICONES.delivery],
       ["estoque", "Estoque", ICONES.estoque], ["produtos", "Produtos", ICONES.produtos], ["clientes", "Clientes", ICONES.clientes],
-      ["relatorios", "Relatórios", ICONES.relatorios], ["config", "Config", ICONES.config],
+      ["apps", "Apps", ICONES.apps], ["relatorios", "Relatórios", ICONES.relatorios], ["config", "Config", ICONES.config],
     ],
     tipos: {
-      "Tutorial": ["Tutoriais", "passo a passo curtos"],
-      "Treinamento": ["Treinamentos", "aulas completas por assunto"],
-      "Demonstração": ["Demonstrações", "apresentação do sistema"],
+      "Demonstrações e tutoriais": ["Demonstrações e tutoriais", "vídeos do PDV+ (Navi Vendas)"],
     },
   },
 };
@@ -160,7 +158,7 @@ function itemVideo(v) {
   return `<button class="item" data-video="${v.id}">
     <span class="play">${PLAY}</span>
     <span><span class="t">${esc(v.titulo)}</span>
-    <span class="meta">${v.tipos.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</span></span>
+    <span class="meta">${v.tipos.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}${v.blocos.length ? "" : `<span class="tag">sem narração</span>`}</span></span>
   </button>`;
 }
 
@@ -239,7 +237,7 @@ function tocar(seg, auto) {
 function desenharTranscricao(ts) {
   $("#transcricao").innerHTML = atual.blocos.map((b, i) =>
     `<div class="bloco" data-i="${i}"><button class="tempo" data-seg="${b.seg}">${b.tempo}</button><span>${destacar(b.texto, ts)}</span></div>`
-  ).join("") || `<p class="vazio-msg">Vídeo sem legenda.</p>`;
+  ).join("") || `<p class="vazio-msg">Este vídeo não tem narração: só mostra as telas do sistema com música.<br>Assista pelo player ao lado.</p>`;
 }
 
 function marcarBloco(seg) {

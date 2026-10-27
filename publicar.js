@@ -4,7 +4,7 @@
 const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
-const { carregar } = require("./dados");
+const { SISTEMAS, carregar } = require("./dados");
 
 const DOCS = path.join(__dirname, "docs");
 
@@ -13,7 +13,9 @@ function gerar() {
   for (const arq of fs.readdirSync(path.join(__dirname, "public"))) {
     fs.copyFileSync(path.join(__dirname, "public", arq), path.join(DOCS, arq));
   }
-  fs.writeFileSync(path.join(DOCS, "conteudo.json"), JSON.stringify(carregar()));
+  for (const [id, cfg] of Object.entries(SISTEMAS)) {
+    if (fs.existsSync(cfg.pasta)) fs.writeFileSync(path.join(DOCS, cfg.arquivo), JSON.stringify(carregar(id)));
+  }
   fs.writeFileSync(path.join(DOCS, ".nojekyll"), "");
 }
 
