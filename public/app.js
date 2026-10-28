@@ -222,7 +222,6 @@ function abrir(id, seg) {
   atual = v;
   $("#dlg-titulo").textContent = v.titulo;
   $("#dlg-meta").innerHTML = `<span class="tag">${esc(nomeModulo(v.modulo))}</span>` + v.tipos.map((t) => `<span class="tag">${esc(t)}</span>`).join("");
-  $("#yt").href = v.url;
   $("#q-local").value = "";
   tocar(seg || 0, seg != null);
   desenharTranscricao(termos(estado.q));
@@ -231,7 +230,9 @@ function abrir(id, seg) {
 }
 
 function tocar(seg, auto) {
-  $("#iframe").src = `https://www.youtube-nocookie.com/embed/${atual.id}?start=${Math.floor(seg)}&rel=0${auto ? "&autoplay=1" : ""}`;
+  // youtube.com/embed (e não youtube-nocookie.com): o nocookie passou a dar "Ocorreu um erro" ao reproduzir.
+  $("#iframe").src = `https://www.youtube.com/embed/${atual.id}?start=${Math.floor(seg)}&rel=0&playsinline=1${auto ? "&autoplay=1" : ""}`;
+  $("#yt").href = `https://www.youtube.com/watch?v=${atual.id}${seg ? `&t=${Math.floor(seg)}s` : ""}`;
 }
 
 function desenharTranscricao(ts) {
