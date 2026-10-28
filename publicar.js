@@ -3,15 +3,27 @@
 //      node publicar.js --so-gerar -> só gera a pasta docs/, sem enviar
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const { execFileSync } = require("child_process");
 const { SISTEMAS, carregar } = require("./dados");
 
 const DOCS = path.join(__dirname, "docs");
 
+// Marca app.js e estilo.css com a "versão" (resumo do conteúdo) nas páginas, para o navegador
+// não usar a cópia antiga do cache do GitHub Pages depois de uma atualização da tela.
+const versao = (arq) => crypto.createHash("sha1").update(fs.readFileSync(arq)).digest("hex").slice(0, 8);
+
 function gerar() {
   fs.mkdirSync(DOCS, { recursive: true });
-  for (const arq of fs.readdirSync(path.join(__dirname, "public"))) {
-    fs.copyFileSync(path.join(__dirname, "public", arq), path.join(DOCS, arq));
+  const pub = path.join(__dirname, "public");
+  const arquivos = fs.readdirSync(pub);
+  for (const arq of arquivos) {
+    if (!arq.endsWith(".html")) { fs.copyFileSync(path.join(pub, arq), path.join(DOCS, arq)); continue; }
+    let html = fs.readFileSync(path.join(pub, arq), "utf8");
+    for (const dep of arquivos.filter((a) => /\.(js|css)$/.test(a))) {
+      html = html.split(`"${dep}"`).join(`"${dep}?v=${versao(path.join(pub, dep))}"`);
+    }
+    fs.writeFileSync(path.join(DOCS, arq), html);
   }
   for (const [id, cfg] of Object.entries(SISTEMAS)) {
     if (fs.existsSync(cfg.pasta)) fs.writeFileSync(path.join(DOCS, cfg.arquivo), JSON.stringify(carregar(id)));
